@@ -1,0 +1,22 @@
+# Generated assets and output
+*.blend
+*.png
+!docs/images/*.png
+output/
+assets/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Internal docs (not for publication)
+**/PLAN.md
+**/SPEC.md
+**/CLAUDE.md
+**/QWEN.md
+
+# IDE and tools
+.claude/
+.vscode/
+*.swp
+*.tmp
