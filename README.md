@@ -25,6 +25,7 @@ Generate complete room interiors in one click — use as a starting point for ar
 - **Procedural** mode — generates furniture and decor on-the-fly (no pre-built .blend files needed)
 - Chairs automatically placed around tables
 - Curtains on windows, rugs on floor, cushions & plush toys on beds, books on shelves — all automatic
+- Paintings, photo frames, and rugs use procedural patterns by default; optionally drop your own images into `assets/pool/pictures/`, `assets/pool/photoframes/`, or `assets/pool/rugs/`
 - Per-type limits and spawn probabilities based on room size
 - Collision-aware placement respecting room boundaries and existing objects
 - Procedural room materials (parquet/tile/laminate, plaster/paint/wallpaper)
