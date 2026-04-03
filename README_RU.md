@@ -28,9 +28,7 @@
 
 ## Установка
 
-1. Скачать или клонировать репозиторий, затем:
-   - Скопировать папку `roomicon/` в директорию аддонов Blender, или
-   - Запаковать в .zip и установить через **Edit > Preferences > Add-ons > Install**
+1. Скачать .zip из [Releases](https://github.com/neurospiritus/roomicon/releases) и установить через **Edit > Preferences > Add-ons > Install**, или клонировать репозиторий и скопировать папку `roomicon/` в директорию аддонов Blender.
 
 2. Активировать аддон **Roomicon** в списке.
 

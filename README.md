@@ -30,9 +30,7 @@ Generate complete room interiors in one click — use as a starting point for ar
 
 ## Installation
 
-1. Download or clone the repository, then either:
-   - Copy the `roomicon/` folder to Blender's add-ons directory, or
-   - Zip the folder and install via **Edit > Preferences > Add-ons > Install**
+1. Download the .zip from [Releases](https://github.com/neurospiritus/roomicon/releases) and install via **Edit > Preferences > Add-ons > Install**, or clone the repository and copy the `roomicon/` folder to Blender's add-ons directory.
 
 2. Enable the **Roomicon** add-on in the list.
 
