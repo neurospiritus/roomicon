@@ -15,10 +15,7 @@ Generate complete room interiors in one click — use as a starting point for ar
 ## Features
 
 - Rectangular room with customizable dimensions (width, length, height)
-- 4 walls (Front / Back / Left / Right) individually configured: empty / door / windows
 - Window frames (configurable: divisions, crossbar height)
-- Door frame + panel with handle (origin at hinges for open animation)
-- Baseboards around the perimeter (cut at doorway)
 - Procedural materials for floors (parquet, tile, laminate), walls (plaster, paint, wallpaper), doors, baseboards — optionally bakeable to .blend
 - Furniture: tables (8 types), chairs (6 types), beds & sofas (6 types), wardrobes, nightstands, dressers
 - Decor: kitchenware, lamps, clocks, shelves, paintings, photo frames, rugs, cushions, curtains, mirrors, books, plants, candles, plush toys
@@ -26,12 +23,9 @@ Generate complete room interiors in one click — use as a starting point for ar
 - Chairs automatically placed around tables
 - Curtains on windows, rugs on floor, cushions & plush toys on beds, books on shelves — all automatic
 - Paintings, photo frames, and rugs use procedural patterns by default; optionally drop your own images into `assets/pool/pictures/`, `assets/pool/photoframes/`, or `assets/pool/rugs/`
-- Per-type limits and spawn probabilities based on room size
 - Collision-aware placement respecting room boundaries and existing objects
-- Procedural room materials (parquet/tile/laminate, plaster/paint/wallpaper)
 - Room size presets: Small / Medium / Large / XLarge for **Randomize**
 - **Density** and **Seed** parameters for controlling fill level and reproducibility
-- Camera (18mm, at Front wall) and lighting (Sun + Area lights in windows)
 - Visibility toggles for ceiling and each wall
 
 ## Installation
@@ -64,67 +58,6 @@ Generate complete room interiors in one click — use as a starting point for ar
 5. **Randomize** — random parameters from the size preset + generate
 6. **Clear Room** — remove everything generated
 
-## Wall Layout
-
-```
-              Back (width, windows by default)
-          ┌─────────────────────┐
-          │                     │
-   Left   │                     │  Right
- (length, │       room          │ (length)
-door,     │                     │
-camera)   │                     │
-          └─────────────────────┘
-               Front (width)
-```
-
-## Project Structure
-
-```
-__init__.py                    # Entry point: UI, operators, properties
-core/                          # Room generation logic
-  room_geometry.py             # Walls, floor, ceiling, baseboards
-  camera_lighting.py           # Camera and lighting
-  placement.py                 # Furniture/decor placement algorithm
-  scene_builder.py             # Two-phase scene assembly
-  post_placement.py            # Cushions, plush toys, books on furniture
-  procedural.py                # Generator mappings and imports
-  openings.py                  # Window frames, door assembly
-  asset_loader.py              # Object loading from .blend
-  material_loader.py           # Material loading from .blend
-materials/                     # Procedural materials (fallback)
-  room_materials.py            # Floor, walls, ceiling, baseboards
-  furniture_materials.py       # Furniture, decor, doors, frames
-assets/                        # .blend files (generated)
-  furniture/                   # Furniture assets
-  decor/                       # Decor assets
-  materials/                   # Materials by category
-tools/
-  generate_assets.py           # Generate .blend objects
-  generate_materials.py        # Generate .blend materials
-  batch_generate.py            # Batch room generation (headless)
-  generators/                  # 20 standalone generators (headless)
-    common/                    # Shared generator infrastructure
-    kitchenware/               # Plates, vases, glasses, cups
-    lamps/                     # Table, floor, wall, ceiling lamps
-    clocks/                    # Wall, tabletop, grandfather clocks
-    shelves/                   # Single, multi-tier, box shelves
-    paintings/                 # Paintings from images + frames
-    photoframes/               # Tabletop and wall photo frames
-    tables/                    # 8 table types
-    chairs/                    # 6 chair/armchair types
-    seating/                   # Beds, sofas, daybeds
-    wardrobes/                 # Wardrobes, nightstands, dressers
-    rugs/                      # Rectangular, circular, oval rugs
-    cushions/                  # Square, round, bolster cushions
-    curtains/                  # Straight, tied-back, roman blinds
-    mirrors/                   # Rectangle, round, oval, arched
-    booksets/                  # Rows, stacks, leaning books
-    plants/                    # Succulents, ficus, cactus, fern
-    candles/                   # Pillar, candlestick, tealight
-    plushtoys/                 # Bear, bunny, penguin, duck
-```
-
 ## Batch Generation
 
 Generate multiple room variations in headless mode with rendering and HTML gallery:
@@ -145,16 +78,6 @@ blender --background --python tools/batch_generate.py -- --help
 
 Output in `output/` folder: PNG renders, .blend files, `index.html` gallery.
 
-Configuration example (`batch_example.json`):
-```json
-{
-    "width": [4.0, 6.0],
-    "length": [3.0, 5.0],
-    "height": [2.5, 3.0],
-    "density": [0.3, 0.7]
-}
-```
-
 ## Asset Generation
 
 ### Bulk generation (all types)
@@ -163,10 +86,7 @@ Configuration example (`batch_example.json`):
 # Default: 5 variants per type
 blender --background --python tools/generate_assets.py
 
-# 10 variants per type
-blender --background --python tools/generate_assets.py -- --count 10
-
-# Only tables
+# Only tables, 20 variants
 blender --background --python tools/generate_assets.py -- --type table --count 20
 ```
 
