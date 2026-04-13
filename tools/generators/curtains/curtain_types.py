@@ -109,7 +109,6 @@ def _make_sheer(rng, window_width, window_top_z, floor_z=0,
     objects = []
 
     curtain_width = window_width * rng.uniform(1.2, 1.6)
-    curtain_height = window_top_z - floor_z + 0.1
     rod_z = window_top_z + 0.08
 
     sheer_mat = fabric if fabric is not None else mat_sheer()
@@ -123,7 +122,7 @@ def _make_sheer(rng, window_width, window_top_z, floor_z=0,
     objects.append(rod)
 
     # Тюль — одна панель, мелкие складки
-    panel = create_curtain_mesh("Sheer", curtain_width, curtain_height,
+    panel = create_curtain_mesh("Sheer", curtain_width, rod_z,
                                  folds=rng.randint(15, 25),
                                  fold_depth=rng.uniform(0.015, 0.025))
     panel.location = (0, 0, floor_z)

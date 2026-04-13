@@ -57,7 +57,7 @@ def _make_single(rng):
 
         # Горизонтальная часть кронштейна (под доской)
         h_bar = create_box(f"BracketH_{side}",
-                            br_thick / 2, br_depth / 2, br_thick / 2,
+                            br_thick / 2, br_depth / 2 - br_thick, br_thick / 2,
                             cx=bx, cy=br_depth / 2, cz=-ht - br_thick / 2)
         _assign_mat(h_bar, br_mat)
         objects.append(h_bar)
@@ -74,7 +74,7 @@ def _make_single(rng):
 
             angle = 0.5
             diag = create_box(f"BracketD_{side}",
-                               br_thick / 2, br_depth * 0.35, br_thick / 2)
+                               br_thick / 3, br_depth * 0.35, br_thick / 2)
             diag.location = (bx, br_depth * 0.35 - br_thick,-ht - br_height * 0.5 + br_depth * 0.35 * math.sin(angle) + br_thick)
             # Грубая аппроксимация диагонали — наклонённый бокс
             diag.rotation_euler = (angle, 0, 0)
@@ -168,7 +168,7 @@ def _make_bracket(rng):
         # Горизонтальная часть Г
         h_bar = create_box(f"BracketH_{side}",
                             br_t / 2, depth * 0.85 / 2, br_t / 2,
-                            cx=bx, cy=depth * 0.85 / 2, cz=-ht - br_t / 2)
+                            cx=bx, cy=depth * 0.85 / 2 + br_t, cz=-ht - br_t / 2)
         _assign_mat(h_bar, br_mat)
         objects.append(h_bar)
 

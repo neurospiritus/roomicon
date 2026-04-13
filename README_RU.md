@@ -4,11 +4,11 @@
 
 Генерируйте готовые интерьеры в один клик — как заготовку для архитектурной визуализации, быстрые фоны для визуальных новелл и анимаций, или чтобы автоматизировать рутинную часть моделирования и сосредоточиться на творческих деталях.
 
-![Генератор комнат](docs/images/s1_blender.png)
-![Генератор ассетов](docs/images/s2_blender.png)
-![Пример рендера 1](docs/images/s3_render.png)
-![Пример рендера 2](docs/images/s4_render.png)
-![Галерея](docs/images/s5_gallery.png)
+![Пример рендера 1](docs/images/s1_render.png)
+![Пример рендера 2](docs/images/s2_render.png)
+![Галленея 1](docs/images/s3_gallery.png)
+![Галлерея 2](docs/images/s4_gallery.png)
+![Генератор комнат](docs/images/s5_ui.png)
 
 ## Возможности
 
@@ -24,7 +24,9 @@
 - Автоматическая расстановка с учётом границ комнаты, коллизий и логики размещения
 - Пресеты площади: Small / Medium / Large / XLarge для **Randomize**
 - Параметры **Density** и **Seed** для контроля плотности и воспроизводимости
-- Переключатели видимости потолка и каждой стены
+- **Стили рендеринга:** Realistic (Cycles, PBR, естественное освещение) и Anime (EEVEE, cel-shading, Freestyle контуры)
+- Настраиваемый параметр **Cel Shading** для anime-стиля (от мягких градиентов до плоских цветов)
+- Переключатели видимости потолка и каждой стены (только во вьюпорте, рендерится всегда)
 
 ## Установка
 
@@ -49,7 +51,7 @@
    - **Walls** — тип каждой стены (None / Door / Windows), количество окон, видимость (иконка глаза)
    - **Door** ▸ — ширина и высота двери (свёрнуто по умолчанию)
    - **Windows** ▸ — ширина, высота, высота подоконника, количество камер, высота горизонтальной планки (свёрнуто по умолчанию)
-   - **Generation** — density и seed
+   - **Generation** — стиль (Realistic/Anime), cel shading, density, seed
 4. Нажать **Generate Room**
 5. **Randomize** — случайные параметры из пресета площади + генерация
 6. **Clear Room** — удалить всё сгенерированное
@@ -59,14 +61,17 @@
 Генерация множества вариантов комнат в headless-режиме с рендером и HTML-галереей:
 
 ```bash
-# 10 вариантов со случайным seed
+# 10 реалистичных вариантов
 blender --background --python tools/batch_generate.py -- --count 10
+
+# Anime-стиль
+blender --background --python tools/batch_generate.py -- --count 10 --style ANIME
+
+# Anime с настройкой cel-shading
+blender --background --python tools/batch_generate.py -- --count 10 --style ANIME --cel-shading 0.8
 
 # Только большие комнаты
 blender --background --python tools/batch_generate.py -- --count 10 --room-size LARGE
-
-# С заданным начальным seed и разрешением
-blender --background --python tools/batch_generate.py -- --count 20 --seed-start 100 --resolution 2560x1440
 
 # Полный список параметров
 blender --background --python tools/batch_generate.py -- --help

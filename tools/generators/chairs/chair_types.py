@@ -75,8 +75,9 @@ def _make_dining(rng):
     seat_d = rng.uniform(0.40, 0.45)
     seat_h = 0.46
     seat_thick = rng.uniform(0.025, 0.04)
+
     back_h = rng.uniform(0.38, 0.48)
-    back_thick = rng.uniform(0.02, 0.03)
+    back_thick = seat_thick 
     leg_r = rng.uniform(0.015, 0.025)
 
     hw, hd = seat_w / 2, seat_d / 2
@@ -106,25 +107,26 @@ def _make_dining(rng):
         objects.append(back)
     elif back_style == 'slats':
         n_slats = rng.randint(3, 5)
-        slat_w = 0.025
+        slat_w = back_thick
         spacing = (seat_w * 0.8) / (n_slats + 1)
         for si in range(n_slats):
             sx = -hw * 0.8 + spacing * (si + 1)
-            slat = create_box(f"DiningSlat{si}", slat_w / 2, back_thick / 2, back_h / 2,
-                                cx=sx, cy=back_y, cz=seat_h + seat_thick / 2 + back_h / 2)
+            slat = create_box(f"DiningSlat{si}", slat_w / 2, back_thick / 2, back_h/2,
+                                cx=sx, cy=back_y, cz=seat_h + seat_thick/2 + back_h / 2  )
             slat.data.materials.append(wood)
             objects.append(slat)
         # Верхняя перекладина
-        rail = create_box("DiningRail", hw * 0.9, back_thick / 2, 0.02,
-                            cy=back_y, cz=seat_h + seat_thick / 2 + back_h)
+        reil_h = rng.uniform(0.02,0.03)
+        rail = create_box("DiningRail", hw * 0.9, back_thick / 2, reil_h,
+                            cy=back_y, cz=seat_h + seat_thick/2 + back_h + reil_h)
         rail.data.materials.append(wood)
         objects.append(rail)
     else:  # cross
         # X-образная спинка
         for dx in (-1, 1):
-            cross = create_box(f"DiningCross{dx}", 0.015, back_thick / 2, back_h * 0.6,
+            cross = create_box(f"DiningCross{dx}", 0.015, back_thick / 2, back_h / 2 ,
                                 cx=dx * hw * 0.3, cy=back_y,
-                                cz=seat_h + seat_thick / 2 + back_h * 0.4)
+                                cz=seat_h + seat_thick / 2 + back_h / 2)
             cross.rotation_euler = (0, 0, dx * 0.3)
             cross.data.materials.append(wood)
             objects.append(cross)
@@ -142,7 +144,7 @@ def _make_normal(rng):
 
     slat_angle = rng.uniform(0.01,0.2)
     slat_angle2 = rng.uniform(0.04,0.2)
-    w_diff = rng.uniform(0.1,0.3)
+    w_diff = rng.uniform(0.01,0.1)
     seat_w = rng.uniform(0.40, 0.48)
     seat_d = rng.uniform(0.40, 0.45) * (1 - w_diff/2)
     seat_h = 0.46

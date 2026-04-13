@@ -6,11 +6,11 @@ A Blender 4.0 add-on that procedurally generates interior rooms: geometry, furni
 
 Generate complete room interiors in one click — use as a starting point for architectural visualization, quickly produce backgrounds for visual novels or animations, or automate the routine part of interior modeling and focus on creative details.
 
-![Room Generator UI](docs/images/s1_blender.png)
-![Asset Generator UI](docs/images/s2_blender.png)
-![Render Example 1](docs/images/s3_render.png)
-![Render Example 2](docs/images/s4_render.png)
-![Batch Gallery](docs/images/s5_gallery.png)
+![Render Example 1](docs/images/s1_render.png)
+![Render Example 2](docs/images/s2_render.png)
+![Batch Gallery 1](docs/images/s3_gallery.png)
+![Batch Gallery 2](docs/images/s4_gallery.png)
+![Room Generator](docs/images/s5_ui.png)
 
 ## Features
 
@@ -26,7 +26,9 @@ Generate complete room interiors in one click — use as a starting point for ar
 - Collision-aware placement respecting room boundaries and existing objects
 - Room size presets: Small / Medium / Large / XLarge for **Randomize**
 - **Density** and **Seed** parameters for controlling fill level and reproducibility
-- Visibility toggles for ceiling and each wall
+- **Render styles:** Realistic (Cycles, PBR, natural lighting) and Anime (EEVEE, cel-shading, Freestyle outlines)
+- Adjustable **Cel Shading** parameter for anime style (soft gradients to hard flat colors)
+- Visibility toggles for ceiling and each wall (viewport only, always renders)
 
 ## Installation
 
@@ -51,7 +53,7 @@ Generate complete room interiors in one click — use as a starting point for ar
    - **Walls** — wall type (None / Door / Windows), window count, visibility (eye icon)
    - **Door** ▸ — door width and height (collapsed by default)
    - **Windows** ▸ — width, height, sill height, divisions, crossbar (collapsed by default)
-   - **Generation** — density and seed
+   - **Generation** — style (Realistic/Anime), cel shading, density, seed
 4. Click **Generate Room**
 5. **Randomize** — random parameters from the size preset + generate
 6. **Clear Room** — remove everything generated
@@ -61,14 +63,17 @@ Generate complete room interiors in one click — use as a starting point for ar
 Generate multiple room variations in headless mode with rendering and HTML gallery:
 
 ```bash
-# 10 variants with random seeds
+# 10 realistic variants
 blender --background --python tools/batch_generate.py -- --count 10
+
+# Anime style
+blender --background --python tools/batch_generate.py -- --count 10 --style ANIME
+
+# Anime with custom cel-shading
+blender --background --python tools/batch_generate.py -- --count 10 --style ANIME --cel-shading 0.8
 
 # Large rooms only
 blender --background --python tools/batch_generate.py -- --count 10 --room-size LARGE
-
-# Custom seed range and resolution
-blender --background --python tools/batch_generate.py -- --count 20 --seed-start 100 --resolution 2560x1440
 
 # Full list of options
 blender --background --python tools/batch_generate.py -- --help

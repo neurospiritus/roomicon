@@ -47,7 +47,7 @@ FRAME_WIDTH = 0.04
 MULLION_WIDTH = 0.03
 
 
-def create_window_frame(name, opening, wall_thickness, divisions=2, crossbar_pos=0.7, wide_sill=False):
+def create_window_frame(name, opening, wall_thickness, divisions=2, crossbar_pos=0.7, wide_sill=False, flip_sill=False):
     """
     Window frame in an opening.
     divisions: number of sections (1 = no vertical bars, 2 = one, 3 = two)
@@ -67,12 +67,13 @@ def create_window_frame(name, opening, wall_thickness, divisions=2, crossbar_pos
     z_bot = oz - hh
     # Top
     _add_box(bm, ox, fy, z_top - fw, hw, fd, fw)
-    # Bottom (sill)
+    # Bottom (sill) — offset toward room interior
+    sill_sign = -1 if flip_sill else 1
     if wide_sill:
         sill_depth = fd + 0.08
-        _add_box(bm, ox, fy + 0.04, z_bot + fw, hw + 0.03, sill_depth, fw * 1.2)
+        _add_box(bm, ox, fy + sill_sign * 0.04, z_bot + fw, hw + 0.03, sill_depth, fw * 1.2)
     else:
-        _add_box(bm, ox, fy + 0.01, z_bot + fw, hw + 0.02, fd + 0.01, fw)
+        _add_box(bm, ox, fy + sill_sign * 0.01, z_bot + fw, hw + 0.02, fd + 0.01, fw)
     # Left
     _add_box(bm, ox - hw + fw, fy, oz, fw, fd, hh - fw)
     # Right

@@ -1,2 +1,3 @@
 from .room_materials import create_ceiling_material, assign_room_materials
 from .furniture_materials import assign_furniture_material
+from .anime_materials import setup_anime_render, setup_realistic_render, convert_scene_to_anime

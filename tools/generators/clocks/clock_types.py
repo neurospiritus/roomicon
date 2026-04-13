@@ -147,7 +147,8 @@ def _make_square_wall(rng):
 def _make_alarm(rng):
     """Настольный будильник: круглый корпус на ножках."""
     radius = rng.uniform(0.04, 0.06)
-    depth = rng.uniform(0.025, 0.035)
+    depth = rng.uniform(0.007, 0.014)
+    depth_c = rng.uniform(0.025, 0.035)
     leg_h = rng.uniform(0.001, 0.01)
     leg_r = 0.004
 
@@ -156,11 +157,11 @@ def _make_alarm(rng):
     # Ножки (2 штуки)
     for side in (-1, 1):
         leg = create_cylinder(f"ClockLeg_{side}", leg_r, leg_h*3)
-        leg.location = (side * radius * 0.5, -depth/2.5, 0)
+        leg.location = (side * radius * 0.5, -depth/2, 0)
         objects.append(leg)
 
     # Корпус
-    body = create_cylinder("ClockBody", radius, depth, z_offset=0)
+    body = create_cylinder("ClockBody", radius, depth_c, z_offset=0)
     body.rotation_euler = (math.pi / 2, 0, 0)
     body.location = (0, 0, leg_h + radius)
     objects.append(body)
@@ -174,7 +175,7 @@ def _make_alarm(rng):
 
     # Стрелки
     hour, minute = _random_time(rng)
-    hand_objs = create_hands("Clock", radius * 0.9, depth, hour, minute)
+    hand_objs = create_hands("Clock", radius * 0.9, depth / 2, hour, minute)
     for obj in hand_objs:
         obj.location.z += leg_h + radius
     objects.extend(hand_objs)
@@ -187,7 +188,7 @@ def _make_alarm(rng):
     # «Колокольчик» сверху
     bell_r = radius * rng.uniform(0.15, 0.25)
     bell = create_cylinder("ClockBell", bell_r, bell_r * 1.5)
-    bell.location = (0, -depth/2, leg_h + radius * 2 - bell_r * 0.3)
+    bell.location = (0, -depth, leg_h + radius * 2 - bell_r * 0.3)
     objects.append(bell)
 
     body_mat, face_mat, hands_mat, glass_mat = _pick_materials(rng)
@@ -206,7 +207,7 @@ def _make_grandfather(rng):
     depth = rng.uniform(0.15, 0.2)
     total_h = rng.uniform(1.6, 2.0)
     face_radius = width * 0.35
-    depth_numbers = rng.uniform(0.02,0.06)
+    depth_numbers = rng.uniform(0.01,0.03)
 
     top_h = total_h * 0.3     # верхняя секция (циферблат)
     mid_h = total_h * 0.5     # средняя (маятник)
@@ -227,7 +228,7 @@ def _make_grandfather(rng):
     objects.append(mid_l)
     mid_r = create_box("ClockMid_r", hw/10, hd, mid_h / 2, cz=base_h + mid_h / 2,cx=-hw*0.9)
     objects.append(mid_r)
-    mid_back = create_box("ClockMid_b", hw, hd/10, mid_h / 2, cz=base_h + mid_h / 2,cy=-hd)
+    mid_back = create_box("ClockMid_b", hw, hd/40, mid_h / 2, cz=base_h + mid_h / 2,cy=-hd - hd/40)
     objects.append(mid_back)
     mid_top = create_box("ClockMid_t", hw*.8, hd, mid_h / 10)
     mid_top.location = (0,0,total_h * 0.65)
@@ -284,7 +285,7 @@ def _make_grandfather(rng):
 
     # Стекло на средней секции (чтобы маятник был виден)
     mid_glass = create_box("ClockMidGlass", hw * 0.8, 0.002, total_h*0.15)
-    mid_glass.location = (0,hd + 0.002, total_h*0.45)
+    mid_glass.location = (0,hd , total_h*0.45)
     objects.append(mid_glass)
 
     body_mat, face_mat, hands_mat, glass_mat = _pick_materials(rng)

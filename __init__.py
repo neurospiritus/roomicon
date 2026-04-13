@@ -43,13 +43,14 @@ import asset_generator
 
 from materials import assign_room_materials
 from materials.furniture_materials import create_window_frame_material
+from materials.anime_materials import setup_anime_render, setup_realistic_render, convert_scene_to_anime
 from core.openings import create_window_frame
 from core.room_geometry import (
     WALL_DEFS, create_floor, create_ceiling,
     create_wall_with_openings, make_window_openings, make_door_opening,
     create_baseboards, get_wall_interior,
 )
-from core.camera_lighting import setup_camera, setup_lighting
+from core.camera_lighting import setup_camera, setup_lighting, setup_lighting_anime
 from core.scene_builder import place_objects
 from core.post_placement import place_cushions_on_beds, place_books_on_shelves, place_curtains
 from core.openings import create_door_assembly
@@ -114,9 +115,19 @@ def generate_room(props):
     height = props.height
     wall_thickness = props.wall_thickness
 
+    # Remove default objects (Light, Camera, Cube)
+    for name in ('Light', 'Camera', 'Cube'):
+        obj = bpy.data.objects.get(name)
+        if obj and obj.name not in (COLLECTION_NAME,):
+            bpy.data.objects.remove(obj, do_unlink=True)
+
     # Render settings
     scene = bpy.context.scene
-    scene.render.engine = 'BLENDER_EEVEE'
+    style = getattr(props, 'render_style', 'REALISTIC')
+    if style == 'ANIME':
+        setup_anime_render()
+    else:
+        setup_realistic_render()
     scene.render.resolution_x = 1920
     scene.render.resolution_y = 1080
 
@@ -164,7 +175,8 @@ def generate_room(props):
             for j, op in enumerate(openings):
                 frame = create_window_frame(f"WindowFrame_{side}_{j}", op, wall_thickness,
                                             props.window_divisions, props.window_crossbar,
-                                            wide_sill=not has_curtains)
+                                            wide_sill=not has_curtains,
+                                            flip_sill=(side == 'right'))
                 frame.location = origin
                 frame.rotation_euler = rot
                 frame.data.materials.append(frame_mat)
@@ -194,9 +206,15 @@ def generate_room(props):
     # --- Camera and lighting ---
     cam = setup_camera(width, length, height, wall_thickness)
     link_to_collection(cam, col)
-    for light_obj in setup_lighting(width, length, height, wall_thickness, wall_configs,
-                                     props.window_sill_height, props.window_height):
+    lighting_fn = setup_lighting_anime if style == 'ANIME' else setup_lighting
+    for light_obj in lighting_fn(width, length, height, wall_thickness, wall_configs,
+                                  props.window_sill_height, props.window_height):
         link_to_collection(light_obj, col)
+
+    # --- Anime style conversion (after all materials are assigned) ---
+    if style == 'ANIME':
+        cel = getattr(props, 'cel_shading', 0.5)
+        convert_scene_to_anime(col, cel_shading=cel)
 
     # Apply visibility settings
     _apply_visibility(props)
@@ -229,8 +247,8 @@ def _apply_visibility(props):
         visible = getattr(props, prop_name)
         for obj in col.objects:
             if obj.name.startswith(obj_name):
-                obj.hide_viewport = not visible
-                obj.hide_render = not visible
+                obj.hide_set(not visible)
+                obj.hide_render = False
 
 
 def _update_visibility(context):
@@ -401,6 +419,20 @@ class RoomGenProperties(bpy.types.PropertyGroup):
     wall_thickness: FloatProperty(name="Wall Thickness", default=0.15, options={'HIDDEN'})
 
     # Generation
+    render_style: EnumProperty(
+        name="Style",
+        items=[
+            ('REALISTIC', 'Realistic', 'Cycles with PBR materials and natural lighting'),
+            ('ANIME', 'Anime', 'EEVEE with cel-shading, outlines, and flat lighting'),
+        ],
+        default='REALISTIC',
+        description="Visual style for materials, lighting, and render engine",
+    )
+    cel_shading: FloatProperty(
+        name="Cel Shading",
+        default=0.5, min=0.0, max=1.0, subtype='FACTOR',
+        description="Cel-shading contrast: 0=soft gradients, 1=hard flat colors",
+    )
     density: FloatProperty(name="Density", default=0.5, min=0.0, max=1.0, subtype='FACTOR')
     seed: IntProperty(name="Seed", default=0, min=0)
     procedural: BoolProperty(name="Procedural", default=True,
@@ -583,6 +615,9 @@ class ROOM_PT_generation(bpy.types.Panel):
     def draw(self, context):
         props = context.scene.room_gen
         layout = self.layout
+        layout.prop(props, "render_style")
+        if props.render_style == 'ANIME':
+            layout.prop(props, "cel_shading")
         layout.prop(props, "density")
         layout.prop(props, "seed")
         layout.prop(props, "procedural")
