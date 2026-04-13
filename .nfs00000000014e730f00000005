@@ -1,6 +1,0 @@
-#!/bin/sh
-
-rsync -av --delete --exclude='.git/' --exclude='PLAN.md' --exclude='SPEC.md' --exclude='CLAUDE.md' --exclude='QWEN.md' --exclude='NOTES.md' --exclude='assets/' --exclude='output/' --exclude='__pycache__/' --exclude='*.pyc' /mnt/ai/code/blender/rooms/ ./
-
-git add -A
-git status
