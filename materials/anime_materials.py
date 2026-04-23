@@ -25,6 +25,13 @@ def setup_anime_render():
     ls.linestyle.thickness = 1.5
     ls.linestyle.color = (0.1, 0.08, 0.06)
 
+    # Bloom for lamp glow effect
+    scene.eevee.use_bloom = True
+    scene.eevee.bloom_threshold = 1.5
+    scene.eevee.bloom_knee = 0.5
+    scene.eevee.bloom_radius = 6.0
+    scene.eevee.bloom_intensity = 0.3
+
 
 def setup_realistic_render():
     """Configure EEVEE for realistic rendering with enhanced settings."""
@@ -81,6 +88,9 @@ def _make_cel_shader(mat, cel_shading=0.5):
                  1.0=hard flat colors (minimal shading, almost uniform).
     """
     if not mat or not mat.use_nodes:
+        return
+    # Keep lamp bulbs as emission — they glow regardless of style
+    if mat.name.startswith('M_LampBulb'):
         return
 
     tree = mat.node_tree
@@ -164,15 +174,42 @@ def _make_cel_shader(mat, cel_shading=0.5):
         1.0,
     )
 
-    # Emission to avoid additional shading
+    # Emission — cel-shading base (flat, ignores scene lights)
     emission = tree.nodes.new('ShaderNodeEmission')
-    emission.location = (400, 0)
+    emission.name = 'CelEmission'
+    emission.location = (400, 100)
+
+    # Diffuse for lamp response — same color through ColorRamp,
+    # but as Diffuse BSDF it reacts to Point lights
+    lamp_diffuse = tree.nodes.new('ShaderNodeBsdfDiffuse')
+    lamp_diffuse.location = (400, -100)
+
+    # Mix Shader: Emission (cel) ↔ Diffuse (lamp-reactive)
+    # Fac=0 → pure Emission (cel), Fac=1 → pure Diffuse (lit by lamps)
+    mix = tree.nodes.new('ShaderNodeMixShader')
+    mix.name = 'CelLampMix'
+    mix.location = (600, 0)
+
+    # Value node to control mix factor from UI
+    mix_val = tree.nodes.new('ShaderNodeValue')
+    mix_val.name = 'CelLampFactor'
+    mix_val.location = (400, 250)
+    mix_val.outputs[0].default_value = 0.0  # default: pure cel
 
     links.new(diffuse.outputs['BSDF'], s2rgb.inputs['Shader'])
     links.new(s2rgb.outputs['Color'], ramp.inputs['Fac'])
     links.new(ramp.outputs['Color'], emission.inputs['Color'])
     emission.inputs['Strength'].default_value = 1.0
-    links.new(emission.outputs['Emission'], output.inputs['Surface'])
+    links.new(ramp.outputs['Color'], lamp_diffuse.inputs['Color'])
+
+    links.new(mix_val.outputs[0], mix.inputs['Fac'])
+    links.new(emission.outputs['Emission'], mix.inputs[1])
+    links.new(lamp_diffuse.outputs['BSDF'], mix.inputs[2])
+    links.new(mix.outputs['Shader'], output.inputs['Surface'])
+
+    output.location = (800, 0)
+
+    mat['cel_shaded'] = True
 
 
 def convert_scene_to_anime(collection, cel_shading=0.5):

@@ -8,9 +8,9 @@ Generate complete room interiors in one click — use as a starting point for ar
 
 ![Render Example 1](docs/images/s1_render.png)
 ![Render Example 2](docs/images/s2_render.png)
-![Batch Gallery 1](docs/images/s3_gallery.png)
-![Batch Gallery 2](docs/images/s4_gallery.png)
-![Room Generator](docs/images/s5_ui.png)
+![Render Example 3](docs/images/s3_render.png)
+![Room Generator](docs/images/s4_ui.png)
+![Batch Gallery](docs/images/s5_gallery.png)
 
 ## Features
 
@@ -26,8 +26,13 @@ Generate complete room interiors in one click — use as a starting point for ar
 - Collision-aware placement respecting room boundaries and existing objects
 - Room size presets: Small / Medium / Large / XLarge for **Randomize**
 - **Density** and **Seed** parameters for controlling fill level and reproducibility
-- **Render styles:** Realistic (Cycles, PBR, natural lighting) and Anime (EEVEE, cel-shading, Freestyle outlines)
+- **Render styles:** Realistic (EEVEE, PBR, natural lighting) and Anime (EEVEE, cel-shading, Freestyle outlines)
 - Adjustable **Cel Shading** parameter for anime style (soft gradients to hard flat colors)
+- **Lighting Control** — adjust ambient and lamp intensity without regenerating the room
+  - **Ambient** slider (0–2): scales Sun, World, and window lights
+  - **Lamps** slider (0–2): toggles real Point lights inside decorative lamps (warm ~3000K)
+  - Anime: lamps blend Diffuse shading into cel materials for localized light pools + Bloom glow
+  - Create day, evening, or night scenes by adjusting the two sliders
 - Visibility toggles for ceiling and each wall (viewport only, always renders)
 
 ## Installation
@@ -54,6 +59,7 @@ Generate complete room interiors in one click — use as a starting point for ar
    - **Door** ▸ — door width and height (collapsed by default)
    - **Windows** ▸ — width, height, sill height, divisions, crossbar (collapsed by default)
    - **Generation** — style (Realistic/Anime), cel shading, density, seed
+   - **Lighting Control** ▸ — ambient and lamp intensity (collapsed by default)
 4. Click **Generate Room**
 5. **Randomize** — random parameters from the size preset + generate
 6. **Clear Room** — remove everything generated
@@ -71,6 +77,9 @@ blender --background --python tools/batch_generate.py -- --count 10 --style ANIM
 
 # Anime with custom cel-shading
 blender --background --python tools/batch_generate.py -- --count 10 --style ANIME --cel-shading 0.8
+
+# Evening scene with lamps
+blender --background --python tools/batch_generate.py -- --count 10 --ambient 0.2 --lamps 1.0
 
 # Large rooms only
 blender --background --python tools/batch_generate.py -- --count 10 --room-size LARGE

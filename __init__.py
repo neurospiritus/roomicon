@@ -219,6 +219,10 @@ def generate_room(props):
     # Apply visibility settings
     _apply_visibility(props)
 
+    # Apply current lighting slider values to newly created lights
+    _update_ambient(props, bpy.context)
+    _update_lamps(props, bpy.context)
+
     return col
 
 
@@ -253,6 +257,79 @@ def _apply_visibility(props):
 
 def _update_visibility(context):
     _apply_visibility(context.scene.room_gen)
+
+
+# ============================================================
+# Lighting Control
+# ============================================================
+
+def _apply_lighting(self, context):
+    """Apply both ambient and lamp intensity to all light sources."""
+    ambient = self.ambient_intensity
+    lamps = self.lamp_intensity
+
+    # Ambient light objects (Sun, Area, Window)
+    for obj in bpy.data.objects:
+        if obj.get('roomicon_ambient') and obj.type == 'LIGHT':
+            obj.data.energy = obj['base_energy'] * ambient
+
+    # World background
+    world = context.scene.world
+    if world and world.get('roomicon_ambient') and world.use_nodes:
+        bg = world.node_tree.nodes.get('Background')
+        if bg:
+            bg.inputs['Strength'].default_value = world['base_world'] * ambient
+
+    # Decorative lamp Point lights (Realistic)
+    for obj in bpy.data.objects:
+        if obj.get('roomicon_lamp') and obj.type == 'LIGHT':
+            obj.data.energy = obj['base_energy'] * lamps
+            obj.hide_viewport = (lamps == 0)
+            obj.hide_render = (lamps == 0)
+
+    # Anime cel-shading materials
+    # CelEmission Strength: controlled by ambient (global brightness)
+    # CelLampFactor: mix between pure cel (0) and lamp-reactive diffuse (1)
+    cel_strength = ambient
+    lamp_mix = min(1.0, lamps * 0.4)  # lamps=1 → 40% diffuse blend
+    for mat in bpy.data.materials:
+        if not mat.use_nodes:
+            continue
+        tree = mat.node_tree
+        cel_node = tree.nodes.get('CelEmission')
+        if cel_node:
+            cel_node.inputs['Strength'].default_value = max(cel_strength, lamp_mix * 0.5)
+        lamp_fac = tree.nodes.get('CelLampFactor')
+        if lamp_fac:
+            lamp_fac.outputs[0].default_value = lamp_mix
+        if cel_node or lamp_fac:
+            tree.update_tag()
+
+    # Freestyle line darkness — scale with overall brightness
+    vl = context.scene.view_layers[0] if context.scene.view_layers else None
+    if vl and vl.freestyle_settings.linesets:
+        ls = vl.freestyle_settings.linesets[0]
+        brightness = max(cel_strength, lamp_mix * 0.5)
+        f = min(1.0, brightness)
+        ls.linestyle.color = (0.05 + 0.05 * f, 0.04 + 0.04 * f, 0.03 + 0.03 * f)
+
+    # Lamp bulb emission — brighter when lamps are on
+    for mat in bpy.data.materials:
+        if not mat.use_nodes or not mat.name.startswith('M_LampBulb'):
+            continue
+        for node in mat.node_tree.nodes:
+            if node.type == 'BSDF_PRINCIPLED':
+                node.inputs['Emission Strength'].default_value = lamps * 13.0
+                break
+        mat.node_tree.update_tag()
+
+
+def _update_ambient(self, context):
+    _apply_lighting(self, context)
+
+
+def _update_lamps(self, context):
+    _apply_lighting(self, context)
 
 
 # ============================================================
@@ -461,6 +538,18 @@ class RoomGenProperties(bpy.types.PropertyGroup):
     wall_right_type: EnumProperty(name="Right", items=WALL_TYPE_ITEMS, default='NONE')
     wall_right_windows: IntProperty(name="Windows", default=0, min=0, max=4)
 
+    # Lighting
+    ambient_intensity: FloatProperty(
+        name="Ambient", default=1.0, min=0.0, max=2.0, subtype='FACTOR',
+        description="Ambient lighting intensity (Sun, World, Window lights)",
+        update=_update_ambient,
+    )
+    lamp_intensity: FloatProperty(
+        name="Lamps", default=0.0, min=0.0, max=2.0, subtype='FACTOR',
+        description="Decorative lamp intensity (Point lights inside lamps)",
+        update=_update_lamps,
+    )
+
     # Visibility
     show_ceiling: BoolProperty(name="Ceiling", default=False, update=lambda s, c: _update_visibility(c))
     show_wall_front: BoolProperty(name="Front Wall", default=True, update=lambda s, c: _update_visibility(c))
@@ -623,6 +712,22 @@ class ROOM_PT_generation(bpy.types.Panel):
         layout.prop(props, "procedural")
 
 
+class ROOM_PT_lighting(bpy.types.Panel):
+    bl_label = "Lighting Control"
+    bl_idname = "ROOM_PT_lighting"
+    bl_parent_id = "ROOM_PT_main"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Roomicon"
+    bl_options = {'DEFAULT_CLOSED'}
+
+    def draw(self, context):
+        props = context.scene.room_gen
+        layout = self.layout
+        layout.prop(props, "ambient_intensity")
+        layout.prop(props, "lamp_intensity")
+
+
 # ============================================================
 # Registration
 # ============================================================
@@ -639,6 +744,7 @@ classes = (
     ROOM_PT_door,
     ROOM_PT_windows,
     ROOM_PT_generation,
+    ROOM_PT_lighting,
 )
 
 

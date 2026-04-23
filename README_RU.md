@@ -6,9 +6,9 @@
 
 ![Пример рендера 1](docs/images/s1_render.png)
 ![Пример рендера 2](docs/images/s2_render.png)
-![Галленея 1](docs/images/s3_gallery.png)
-![Галлерея 2](docs/images/s4_gallery.png)
-![Генератор комнат](docs/images/s5_ui.png)
+![Пример рендера 3](docs/images/s3_render.png)
+![Генератор комнат](docs/images/s4_ui.png)
+![Галлерея](docs/images/s5_gallery.png)
 
 ## Возможности
 
@@ -24,8 +24,13 @@
 - Автоматическая расстановка с учётом границ комнаты, коллизий и логики размещения
 - Пресеты площади: Small / Medium / Large / XLarge для **Randomize**
 - Параметры **Density** и **Seed** для контроля плотности и воспроизводимости
-- **Стили рендеринга:** Realistic (Cycles, PBR, естественное освещение) и Anime (EEVEE, cel-shading, Freestyle контуры)
+- **Стили рендеринга:** Realistic (EEVEE, PBR, естественное освещение) и Anime (EEVEE, cel-shading, Freestyle контуры)
 - Настраиваемый параметр **Cel Shading** для anime-стиля (от мягких градиентов до плоских цветов)
+- **Управление освещением** — настройка яркости без перегенерации комнаты
+  - **Ambient** (0–2): множитель на Sun, World и оконные источники
+  - **Lamps** (0–2): реальные Point light внутри декоративных ламп (тёплый ~3000K)
+  - Anime: лампы подмешивают Diffuse-шейдинг для локального освещения + Bloom-свечение
+  - Создавайте дневные, вечерние и ночные сцены двумя ползунками
 - Переключатели видимости потолка и каждой стены (только во вьюпорте, рендерится всегда)
 
 ## Установка
@@ -52,6 +57,7 @@
    - **Door** ▸ — ширина и высота двери (свёрнуто по умолчанию)
    - **Windows** ▸ — ширина, высота, высота подоконника, количество камер, высота горизонтальной планки (свёрнуто по умолчанию)
    - **Generation** — стиль (Realistic/Anime), cel shading, density, seed
+   - **Lighting Control** ▸ — яркость ambient и ламп (свёрнуто по умолчанию)
 4. Нажать **Generate Room**
 5. **Randomize** — случайные параметры из пресета площади + генерация
 6. **Clear Room** — удалить всё сгенерированное
@@ -69,6 +75,9 @@ blender --background --python tools/batch_generate.py -- --count 10 --style ANIM
 
 # Anime с настройкой cel-shading
 blender --background --python tools/batch_generate.py -- --count 10 --style ANIME --cel-shading 0.8
+
+# Вечерняя сцена с лампами
+blender --background --python tools/batch_generate.py -- --count 10 --ambient 0.2 --lamps 1.0
 
 # Только большие комнаты
 blender --background --python tools/batch_generate.py -- --count 10 --room-size LARGE

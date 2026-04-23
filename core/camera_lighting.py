@@ -34,6 +34,8 @@ def setup_lighting(width, length, height, wt, wall_configs, sill_height, window_
     if bg:
         bg.inputs['Color'].default_value = (0.8, 0.85, 0.95, 1.0)
         bg.inputs['Strength'].default_value = 0.3
+    world['roomicon_ambient'] = True
+    world['base_world'] = 0.3
 
     # Sun — warm directional light through the room
     sun_data = bpy.data.lights.new("RoomSun", 'SUN')
@@ -43,6 +45,8 @@ def setup_lighting(width, length, height, wt, wall_configs, sill_height, window_
     sun_obj = bpy.data.objects.new("RoomSun", sun_data)
     sun_obj.location = (width / 2, length / 2, height + 1)
     sun_obj.rotation_euler = (math.radians(45), math.radians(10), math.radians(-30))
+    sun_obj['roomicon_ambient'] = True
+    sun_obj['base_energy'] = 1.5
     objects.append(sun_obj)
 
     # Warm bounce fill from below (simulates floor reflection)
@@ -54,6 +58,8 @@ def setup_lighting(width, length, height, wt, wall_configs, sill_height, window_
     fill_obj = bpy.data.objects.new("RoomFill", fill_data)
     fill_obj.location = (width / 2, length / 2, 0.05)
     fill_obj.rotation_euler = (0, 0, 0)  # facing up
+    fill_obj['roomicon_ambient'] = True
+    fill_obj['base_energy'] = 8.0
     objects.append(fill_obj)
 
     # Area lights in window openings — energy distributed across all windows
@@ -84,6 +90,8 @@ def setup_lighting(width, length, height, wt, wall_configs, sill_height, window_
             light_data.size_y = window_height * 0.9
 
             light_obj = bpy.data.objects.new(f"WindowLight_{side_name}_{i}", light_data)
+            light_obj['roomicon_ambient'] = True
+            light_obj['base_energy'] = per_window_energy
 
             if side_name == 'front':
                 light_obj.location = (pos_along, wt + 0.05, window_z)
@@ -113,6 +121,14 @@ def setup_lighting_anime(width, length, height, wt, wall_configs, sill_height, w
     eevee.shadow_cascade_size = '1024'
     eevee.use_soft_shadows = True
 
+    # World ambient for anime
+    world = bpy.context.scene.world
+    if not world:
+        world = bpy.data.worlds.new("World")
+        bpy.context.scene.world = world
+    world['roomicon_ambient'] = True
+    world['base_world'] = world.node_tree.nodes.get('Background').inputs['Strength'].default_value if world.use_nodes and world.node_tree.nodes.get('Background') else 0.0
+
     # Main fill light — bright, from above, almost white
     sun_data = bpy.data.lights.new("AnimeSun", 'SUN')
     sun_data.energy = 3.0
@@ -121,6 +137,8 @@ def setup_lighting_anime(width, length, height, wt, wall_configs, sill_height, w
     sun_obj = bpy.data.objects.new("AnimeSun", sun_data)
     sun_obj.location = (width / 2, length / 2, height + 1)
     sun_obj.rotation_euler = (math.radians(70), 0, math.radians(-20))
+    sun_obj['roomicon_ambient'] = True
+    sun_obj['base_energy'] = 3.0
     objects.append(sun_obj)
 
     # Fill light from opposite side to reduce shadows
@@ -131,6 +149,8 @@ def setup_lighting_anime(width, length, height, wt, wall_configs, sill_height, w
     fill_obj = bpy.data.objects.new("AnimeFill", fill_data)
     fill_obj.location = (width / 2, length / 2, height)
     fill_obj.rotation_euler = (math.radians(60), 0, math.radians(160))
+    fill_obj['roomicon_ambient'] = True
+    fill_obj['base_energy'] = 1.5
     objects.append(fill_obj)
 
     # Soft area lights in windows — lower energy, warm tint
@@ -158,6 +178,8 @@ def setup_lighting_anime(width, length, height, wt, wall_configs, sill_height, w
             light_data.use_shadow = False
 
             light_obj = bpy.data.objects.new(f"AnimeWindow_{side_name}_{i}", light_data)
+            light_obj['roomicon_ambient'] = True
+            light_obj['base_energy'] = 40.0
 
             if side_name == 'front':
                 light_obj.location = (pos_along, wt + 0.05, window_z)

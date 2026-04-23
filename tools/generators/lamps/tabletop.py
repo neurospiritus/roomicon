@@ -60,9 +60,9 @@ def _make_classic(rng):
 
     # Лампочка внутри абажура
     bulb_z = stem_h + base_h #shade_bottom_z + shade_h * 0.4
-    bulb = create_bulb("LampBulb", shade_r_top * 0.3, rng,
-                        location=(0, 0, bulb_z))
-    objects.append(bulb)
+    bulb, bulb_light = create_bulb("LampBulb", shade_r_top * 0.3, rng,
+                                    location=(0, 0, bulb_z))
+    objects.extend([bulb, bulb_light])
 
     return objects
 
@@ -115,9 +115,9 @@ def _make_nightlight(rng):
     else:
         bulb_z = base_h + shade_r*0.25
 
-    bulb = create_bulb("NightBulb", shade_r * 0.25, rng,
-                        location=(0, 0, bulb_z))
-    objects.append(bulb)
+    bulb, bulb_light = create_bulb("NightBulb", shade_r * 0.25, rng,
+                                    location=(0, 0, bulb_z))
+    objects.extend([bulb, bulb_light])
 
     return objects
 

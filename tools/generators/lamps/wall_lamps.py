@@ -69,10 +69,10 @@ def _make_sconce(rng):
     objects.append(shade)
 
     # Лампочка внутри абажура
-    bulb = create_bulb("SconceBulb", shade_r * 0.25, rng,
-                        location=(0, plate_h + arm_len, 0))
-    bulb.rotation_euler = (math.pi/2,0,0)
-    objects.append(bulb)
+    bulb, bulb_light = create_bulb("SconceBulb", shade_r * 0.25, rng,
+                                    location=(0, plate_h + arm_len, 0))
+    bulb.rotation_euler = (math.pi / 2, 0, 0)
+    objects.extend([bulb, bulb_light])
 
     return objects
 

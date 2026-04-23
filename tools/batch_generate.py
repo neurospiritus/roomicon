@@ -58,6 +58,10 @@ def parse_args():
     parser.add_argument('--style', type=str, default='REALISTIC',
                         choices=['REALISTIC', 'ANIME'])
     parser.add_argument('--cel-shading', type=float, default=0.5)
+    parser.add_argument('--ambient', type=float, default=1.0,
+                        help='Ambient lighting intensity 0.0-2.0 (default 1.0)')
+    parser.add_argument('--lamps', type=float, default=0.0,
+                        help='Decorative lamp intensity 0.0-2.0 (default 0.0)')
     return parser.parse_args(argv)
 
 
@@ -66,7 +70,7 @@ class FakeProps:
     pass
 
 
-def randomize_props(seed, room_size='MEDIUM', style='REALISTIC', cel_shading=0.5):
+def randomize_props(seed, room_size='MEDIUM', style='REALISTIC', cel_shading=0.5, **kwargs):
     """Создаёт FakeProps со случайными параметрами (аналог ROOM_OT_randomize)."""
     rng = random.Random(seed)
     p = FakeProps()
@@ -76,6 +80,8 @@ def randomize_props(seed, room_size='MEDIUM', style='REALISTIC', cel_shading=0.5
     p.procedural = True
     p.render_style = style
     p.cel_shading = cel_shading
+    p.ambient_intensity = kwargs.get('ambient', 1.0)
+    p.lamp_intensity = kwargs.get('lamps', 0.0)
 
     # Размеры из пресета
     area_min, area_max, max_ratio = ROOM_SIZE_RANGES[room_size]
@@ -277,6 +283,7 @@ def main():
     print(f"Resolution: {res_x}x{res_y}")
     print(f"Room size: {args.room_size}")
     print(f"Style: {args.style}")
+    print(f"Ambient: {args.ambient}, Lamps: {args.lamps}")
     print(f"Seed range: {args.seed_start} — {args.seed_start + args.count - 1}")
     print("=" * 60)
 
@@ -289,7 +296,8 @@ def main():
 
         clear_scene()
         props = randomize_props(seed, room_size=args.room_size,
-                                style=args.style, cel_shading=args.cel_shading)
+                                style=args.style, cel_shading=args.cel_shading,
+                                ambient=args.ambient, lamps=args.lamps)
         generate_room(props)
         basename = render_and_save(output_dir, i, seed, res_x, res_y)
 

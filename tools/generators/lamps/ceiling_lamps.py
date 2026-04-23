@@ -90,9 +90,9 @@ def _make_pendant(rng):
 
     # Лампочка
     bulb_z = (shade_top_z + shade_bot_z) / 2
-    bulb = create_bulb("PendantBulb", shade_r * 0.2, rng,
-                        location=(0, 0, bulb_z))
-    objects.append(bulb)
+    bulb, bulb_light = create_bulb("PendantBulb", shade_r * 0.2, rng,
+                                    location=(0, 0, bulb_z))
+    objects.extend([bulb, bulb_light])
 
     return objects
 
@@ -137,9 +137,9 @@ def _make_flush(rng):
     objects.append(shade)
 
     # Лампочка
-    bulb = create_bulb("FlushBulb", base_r * 0.2, rng,
-                        location=(0, 0, -base_h * 0.5))
-    objects.append(bulb)
+    bulb, bulb_light = create_bulb("FlushBulb", base_r * 0.2, rng,
+                                    location=(0, 0, -base_h * 0.5))
+    objects.extend([bulb, bulb_light])
 
     return objects
 

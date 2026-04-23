@@ -59,9 +59,9 @@ def _make_floor_lamp(rng):
 
     # Лампочка
     bulb_z = shade_bottom_z + shade_h * 0.4
-    bulb = create_bulb("FloorBulb", shade_r_top * 0.3, rng,
-                        location=(0, 0, bulb_z))
-    objects.append(bulb)
+    bulb, bulb_light = create_bulb("FloorBulb", shade_r_top * 0.3, rng,
+                                    location=(0, 0, bulb_z))
+    objects.extend([bulb, bulb_light])
 
     return objects
 
@@ -204,9 +204,9 @@ def _make_arc_lamp(rng):
 
     # Лампочка
     bulb_z = shade_z + shade_h * 0.5
-    bulb = create_bulb("ArcBulb", shade_r * 0.25, rng,
-                        location=(arc_reach, 0, bulb_z))
-    objects.append(bulb)
+    bulb, bulb_light = create_bulb("ArcBulb", shade_r * 0.25, rng,
+                                    location=(arc_reach, 0, bulb_z))
+    objects.extend([bulb, bulb_light])
 
     return objects
 

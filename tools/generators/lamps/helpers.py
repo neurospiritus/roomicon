@@ -132,18 +132,31 @@ def create_cylinder(name, radius, height, z_offset=0, segments=SPIN_SEGMENTS):
 # Лампочка
 # ============================================================
 
+_BULB_ENERGY = {
+    'LampBulb': 50,       # tabletop classic
+    'NightBulb': 20,      # tabletop nightlight
+    'FloorBulb': 100,     # floor lamp
+    'ArcBulb': 100,       # arc lamp
+    'SconceBulb': 30,     # wall sconce
+    'PendantBulb': 80,    # ceiling pendant
+    'FlushBulb': 60,      # ceiling flush
+}
+
+
 def create_bulb(name, radius, rng, location=(0, 0, 0)):
-    """Лампочка — вытянутая сфера с emission материалом.
+    """Лампочка — вытянутая сфера с emission материалом + Point light.
 
     Args:
         name: имя объекта
         radius: базовый радиус
         rng: Random для вариативности
         location: позиция (x, y, z)
+
+    Returns:
+        (bulb_mesh, point_light) — оба объекта для включения в иерархию ассета.
     """
     bm = bmesh.new()
     bmesh.ops.create_uvsphere(bm, u_segments=12, v_segments=8, radius=radius)
-    # Случайная вытянутость: 1.0 (сфера) .. 2.0 (вытянутая)
     stretch = rng.uniform(1.0, 2.0)
     for v in bm.verts:
         v.co.z *= stretch
@@ -169,7 +182,20 @@ def create_bulb(name, radius, rng, location=(0, 0, 0)):
     tree.links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
     bulb.data.materials.append(mat)
 
-    return bulb
+    # Point light at same position
+    energy = _BULB_ENERGY.get(name, 50)
+    light_data = bpy.data.lights.new(name + "_Light", 'POINT')
+    light_data.energy = energy
+    light_data.color = (1.0, 0.85, 0.66)  # ~3000K warm
+    light_data.shadow_soft_size = radius * 2
+    light_obj = bpy.data.objects.new(name + "_Light", light_data)
+    light_obj.location = location
+    light_obj['roomicon_lamp'] = True
+    light_obj['base_energy'] = energy
+    light_obj.hide_viewport = True
+    light_obj.hide_render = True
+
+    return bulb, light_obj
 
 
 # ============================================================
